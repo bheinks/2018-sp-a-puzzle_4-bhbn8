@@ -28,3 +28,6 @@ class Node:
         self.state.swap(self.action[0], self.action[1])
         self.state.swaps.append((self.action[0], self.action[1]))
         self.cost += 1
+
+    def __eq__(self, other):
+        return self.state == other.state
