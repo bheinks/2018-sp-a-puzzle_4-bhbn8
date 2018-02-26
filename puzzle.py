@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import re
-from copy import deepcopy
+from copy import copy
 from sys import exit
 
 class Puzzle:
@@ -48,7 +48,11 @@ class Puzzle:
             A deep copy of the puzzle object.
         """
 
-        return deepcopy(self)
+        new = copy(self)
+        new.swaps = self.swaps[:]
+        new.board = [row[:] for row in self.board]
+
+        return new
 
     def print(self):
         """Prints the board."""
