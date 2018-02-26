@@ -173,6 +173,12 @@ class Tree:
         while len(frontier) > 0:
             node = frontier.dequeue()
 
+            # if we've seen the node before, skip it
+            if new_node in explored:
+                continue
+            else:
+                explored.append(new_node)
+
             # keep track of node with highest score
             if node.state.score > self.max_node.state.score:
                 self.max_node = node
@@ -190,11 +196,63 @@ class Tree:
                 # create a new node as a copy of the current
                 new_node = Node(node.state, (dev1, dev2), node, node.cost)
 
-                # if we've seen the node before, skip it
-                if new_node in explored:
-                    continue
-                else:
-                    explored.append(new_node)
+                # swap dev1 and dev2
+                new_node.perform_action()
+
+                # remove any matches
+                new_node.state.remove_matches(new_node.state.get_matches(dev1, dev2))
+
+                # append new node to our queue
+                frontier.enqueue(new_node)
+        # if this happens, we ran out of nodes without reaching our score quota
+        else:
+            # return node with highest score instead
+            node = self.max_node
+
+        return self.show_swaps(node)
+
+    def astargs(self):
+        """Generate, traverse and evaluate tree nodes based on an A* approach
+        using a custom heuristic.
+
+        Returns:
+            The swaps performed by our goal node as displayed by show_swaps().
+            If no solution found, return swaps performed by node with highest
+            score.
+        """
+
+        # create a priority queue for our heuristic, which is abs(quota - score) * cost
+        frontier = PriorityQueue(lambda node: abs(node.state.quota-node.state.score)*node.cost, [self.root])
+
+        # graph search, so explored set
+        explored = []
+
+        # while we still have nodes to evaluate
+        while len(frontier) > 0:
+            node = frontier.dequeue()
+
+            # if we've seen the node before, skip it
+            if node in explored:
+                continue
+            else:
+                explored.append(node)
+
+            # keep track of node with highest score
+            if node.state.score > self.max_node.state.score:
+                self.max_node = node
+
+            # if we reach our score quota, game over
+            if node.state.score >= node.state.quota:
+                break
+
+            # if we reach max swaps, pursue branch no further
+            if node.cost >= node.state.max_swaps:
+                continue
+            
+            # for every valid swap
+            for dev1, dev2 in node.state.get_valid_moves():
+                # create a new node as a copy of the current
+                new_node = Node(node.state, (dev1, dev2), node, node.cost)
 
                 # swap dev1 and dev2
                 new_node.perform_action()
@@ -204,6 +262,7 @@ class Tree:
 
                 # append new node to our queue
                 frontier.enqueue(new_node)
+
         # if this happens, we ran out of nodes without reaching our score quota
         else:
             # return node with highest score instead

@@ -32,8 +32,8 @@ def main(puzzle_file):
     except (TypeError, ValueError) as e:
         sys.exit(e)
 
-    # perform greedy best first graph search and print results
-    print(tree.grbefgs())
+    # perform A* graph search and print results
+    print(tree.astargs())
     print(default_timer() - start_time)
 
 
