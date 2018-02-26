@@ -221,8 +221,8 @@ class Tree:
             score.
         """
 
-        # create a priority queue for our heuristic, which is abs(quota - score) * cost
-        frontier = PriorityQueue(lambda node: abs(node.state.quota-node.state.score)*node.cost, [self.root])
+        # create a priority queue for our heuristic, which is (quota - score) * cost
+        frontier = PriorityQueue(lambda node: (node.state.quota-node.state.score)*node.cost, [self.root])
 
         # graph search, so explored set
         explored = []
@@ -268,4 +268,5 @@ class Tree:
             # return node with highest score instead
             node = self.max_node
 
+        print(node.state.score)
         return self.show_swaps(node)
